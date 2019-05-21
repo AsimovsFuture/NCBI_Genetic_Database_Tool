@@ -1,7 +1,9 @@
 # NCBI_Genetic_Database_Tool
 Project for getting,handling, and saving genomic data from the public NCBI database.
 
-Right now it isn't really implemented. It can work if you adjust the data to work with your linux based system with python 3.x
+Currently little to absolutely no comments on each script, when I start creating the first prototype of the actual system it will have comments and should be usable on most linux systems with no editing of code or python idle interactions
+
+Right now it isn't really implemente, but if you want to try to use it you can. It can work if you adjust the data to work with your linux based system with python 3.x
 
 Will require idle or a new script written to run the geneDB.py script correctly.
 
