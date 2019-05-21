@@ -14,7 +14,7 @@ import os
 # loc = 0
 # count = 0
 # geneList = fileOpen.read().strip().rstrip('\n').split('\n')
-PATH_TO_FASTA = os.path.expanduser("~/Research/Data/FASTA/")
+PATH_TO_FASTA = os.path.expanduser("../Data/FASTA/")
 
 class GeneFASTACaller:
 	def __init__(self, geneList, p = 0):
