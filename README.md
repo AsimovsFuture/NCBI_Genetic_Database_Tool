@@ -7,8 +7,10 @@ Will require idle or a new script written to run the geneDB.py script correctly.
 
 Will also require you to download eutils from NCBI for the terminal instructions found at https://www.ncbi.nlm.nih.gov/books/NBK179288/
 
-Gene.tsv is great for test usage.\n
+Gene.tsv is great for test usage.
+
     - cd to src folder 
+
 	- run python idle by typing 'python3' or 'python' depending on whether python3 is your standard install or not
 		from geneDB import GeneDB
 		testDB = GeneDB(tsv='Gene.tsv')
@@ -18,6 +20,7 @@ Gene.tsv is great for test usage.\n
 		testDB.makeFASTA(id=1)
 		testDB.saveDB('TestDB.db')
 		exit()
+		
 	- start idle again
 		from geneDB import GeneDB
 		## This should recreate the database from the first idle session
