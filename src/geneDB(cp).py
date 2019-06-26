@@ -27,7 +27,6 @@ class GeneDB:
 				for x in f:
 					y = x.strip().split('\t')
 					self.geneList.append(Gene(ID = y[kwargs.get('ID', 1)], Name = y[kwargs.get('Name', 2)]))
-		self.raisedError = kwargs.get('errors',[])
 	
 	@classmethod
 	def fromDB(cls, fileName = 'geneDB.db'):
@@ -44,15 +43,8 @@ class GeneDB:
 		with open(fileName, 'r+') as f:
 			self.geneList = []
 			for x in f:
-				
-				#self.geneList.append(Gene(x))
+				self.geneList.append(Gene(x))
 
-				##Start of testing###########################
-				if x.startswith("Gene"):          ##Testing##
-					self.geneList.append(Gene(x)) ##Testing##
-				else: 					          ##Testing##
-					self.raisedError.append(x)    ##Testing##
-				##End of testing#############################
 
 	def saveDB(self, fileName = ''):
 		if fileName == '':
@@ -62,13 +54,8 @@ class GeneDB:
 			for x in self.geneList:
 				if isinstance(x, Gene):
 					f.write(repr(x) + '\n')
-		
-			##Start of testing#####################
-			for x in self.raisedError: ##Testing##
-				f.write(x)              ##Testing##
-			##End of testing#######################
-			
-	def parallelCallScriptFix(self, geneToCall):				
+					
+	def testCall4ParallelFix(self, geneToCall):				
 		p = sp.run("./callScriptFix.sh %d" % int(geneToCall.getID()), shell=True, stdout=sp.PIPE)
 		info = p.stdout.decode("utf-8").strip().split()
 		missing = []
@@ -80,7 +67,7 @@ class GeneDB:
 			print('Error getting info for gene id %d' % int(geneToCall.getID()))
 		return missing
 
-	def parallelCallScript(self, geneToCall):				
+	def testCall4Parallel(self, geneToCall):				
 		p = sp.run("./callScript.sh %d" % int(geneToCall.getID()), shell=True, stdout=sp.PIPE)
 		info = p.stdout.decode("utf-8").strip().split()
 		try:
@@ -89,69 +76,16 @@ class GeneDB:
 			print('Error getting info for gene id %d' % int(geneToCall.getID()))
 		return geneToCall
 	
-	def testParallelCallScript(self, geneToCall):				
-		p = sp.run("./testCallScript.sh %d" % int(geneToCall.getID()), shell=True, stdout=sp.PIPE)
-		info = p.stdout.decode("utf-8").strip().split()
-		try:
-			geneToCall.setGeneData(Status=info[0], Acc=info[1], Start=info[2], End=info[3])
-		except IndexError:
-			try:
-				self.raisedError.append(geneToCall.getID())
-				geneToCall.setGeneData(Status=info[0])
-			except IndexError:
-				print('Error getting info for gene id %d' % int(geneToCall.getID()))
-		return geneToCall
-		
-	def testPopulateInfoFromNCBI(self, limit = 5):
-		geneList       = []
-		geneIndex      = []
-		geneCallerList = []
-		p              = []
-		lLen           = 0
-		
-		pool = mp.Pool(processes=limit)
-		
-		count = 0
-		for x in self.geneList:
-			if x.getAcc() == None:
-				geneIndex.append(count)
-				geneList.append(x)
-			count += 1
-			
-		lLen = int(math.ceil(len(geneList) / limit))
+	
+	def testParallel(self, inParam):
+		result = self.testCall4Parallel(inParam)
+		return result
 
-		#Start progress bar
-		progString = ('%d out of %d [%%%.2f]' % (0, len(geneList),round(0.00, 2)))
-		width = len(progString) #For backspacing
-		sys.stdout.write(progString)
-		sys.stdout.flush()
-		sys.stdout.write("\b" * (width)) #Backspace to beginning of bar	
-
-		for x in range(0,lLen - 1):
-			results = pool.map(self.testParallelCallScript, geneList[x*limit:((x+1)*limit)])
-						
-			for y in range(len(results)):
-				self.geneList[geneIndex[(x*limit)+y]].setGeneData(gene=results[y])
-
-			#Keep updating progress bar
-			progString = ("%d out of %d [%%%.2f]" % (((x+1)*limit), len(geneList),round(((float((x+1)*limit)/len(geneList))*100.0), 2)))
-			width = len(progString) 
-			sys.stdout.write(progString)
-			sys.stdout.flush()
-			sys.stdout.write("\b" * (width)) 
-			
-		results = pool.map(self.testParallelCallScript, geneList[(lLen - 1)*limit:])
-		
-		#Print final progress report
-		progString = ("%d out of %d [%%100.00]\n" % (len(geneList), len(geneList)))
-		sys.stdout.write(progString)
-		sys.stdout.flush()
-
-		for y in range(len(results)):
-			self.geneList[geneIndex[((lLen - 1)*limit)+y]].setGeneData(gene=results[y])
-		pool.close()
-		pool.join()
-		
+	def testParallelFix(self, inParam):
+		result = self.testCall4ParallelFix(inParam)
+		return result
+				
+	
 	def populateInfoFromNCBI(self, limit = 5):
 		geneList       = []
 		geneIndex      = []
@@ -170,33 +104,13 @@ class GeneDB:
 			
 		lLen = int(math.ceil(len(geneList) / limit))
 
-		#Start progress bar
-		progString = ('%d out of %d [%%%.2f]' % (0, len(geneList),round(0.00, 2)))
-		width = len(progString) #For backspacing
-		sys.stdout.write(progString)
-		sys.stdout.flush()
-		sys.stdout.write("\b" * (width)) #Backspace to beginning of bar	
-		
 		for x in range(0,lLen - 1):
-			results = pool.map(self.parallelCallScript, geneList[x*limit:((x+1)*limit)])
+			results = pool.map(self.testParallel, geneList[x*limit:((x+1)*limit)])
 
 			for y in range(len(results)):
 				self.geneList[geneIndex[(x*limit)+y]].setGeneData(gene=results[y])
-			
-			#Keep updating progress bar
-			progString = ("%d out of %d [%%%.2f]" % (((x+1)*limit), len(geneList),round(((float((x+1)*limit)/len(geneList))*100.0), 2)))
-			width = len(progString) 
-			sys.stdout.write(progString)
-			sys.stdout.flush()
-			sys.stdout.write("\b" * (width)) 	
-
-		results = pool.map(self.parallelCallScript, geneList[(lLen - 1)*limit:])
-		
-		#Print final progress report
-		progString = ("%d out of %d [%%100.00]\n" % (len(geneList), len(geneList)))
-		sys.stdout.write(progString)
-		sys.stdout.flush()
-		
+				
+		results = pool.map(self.testParallel, geneList[(lLen - 1)*limit:])
 		for y in range(len(results)):
 			self.geneList[geneIndex[((lLen - 1)*limit)+y]].setGeneData(gene=results[y])
 		pool.close()
@@ -222,14 +136,14 @@ class GeneDB:
 		lLen = int(math.ceil(len(geneList) / limit))
 		results = {'1':[],'2':[]}
 		for x in range(0,lLen - 1):
-			result = pool.map(self.parallelCallScriptFix, geneList[x*limit:((x+1)*limit)])
+			result = pool.map(self.testParallelFix, geneList[x*limit:((x+1)*limit)])
 			for y in result:
 				if len(y) > 0:
 					results[y[0]].append(y[1])
 			#if len(result) > 0:
 				#print(result)
 				#results.update(result)	
-		result = pool.map(self.parallelCallScriptFix, geneList[(lLen - 1)*limit:])
+		result = pool.map(self.testParallelFix, geneList[(lLen - 1)*limit:])
 		for y in result:
 			if len(y) > 0:
 				results[y[0]].append(y[1])

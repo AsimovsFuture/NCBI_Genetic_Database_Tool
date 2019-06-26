@@ -24,14 +24,16 @@ class GeneCaller:
 			p = sp.run("./callScript.sh %d" % int(x.getID()), shell=True, stdout=sp.PIPE)
 			info = p.stdout.decode("utf-8").strip().split()
 			#print(p.stderror)
-			try:
-				x.setGeneData(Acc=info[0], Start=info[1], End=info[2])
+			#try:
+			x.setGeneData(Acc=info[0], Start=info[1], End=info[2])
 				# f.write(repr(x) + '\n')
-			except IndexError:
-				pass
+			# except KeyboardInterrupt:
+				# print("WORKED")
+				# pass
+			#	pass
 				# m = open('missing_gene_locations', 'a+')
 				# m.write(str(x.getID()) + "\n")
-				
+		return self.gList	
 			
 			# t.write(str(x.getID())) 
 		# sp.run("rm /tmp/.geneCaller_%d_LP" % self.callerID, shell=True)

@@ -28,12 +28,13 @@ class Gene:
 		self.geneLocEnd = kwargs.get('End')
 		self.geneFASTA = kwargs.get('FASTA')
 		self.geneLen = kwargs.get('Len')
+		self.geneStatus = kwargs.get('Status')
 		if self.geneLen == None and self.geneLocStart != None and self.geneLocEnd != None:
 			self.geneLen = abs(int(self.geneLocStart) - int(self.geneLocEnd)) + 1   
 			
 	@classmethod
 	def fromGene(cls, rep):
-		gene = ast.literal_eval(rep.split(' ', 1)[1])
+		gene = ast.literal_eval(repr(rep).split(' ', 1)[1])
 		return cls(**gene)
 		
 	def getFASTA_File(self):
@@ -65,14 +66,21 @@ class Gene:
 	
 	def getName(self):
 		return self.geneName
-
-	def setGeneData(self, **kwargs):
+		
+	def getStatus(self):
+		return self.geneStatus
+		
+	def setGeneData(self, **kwargs):		
+		if kwargs.get('gene') != None:
+				kwargs = ast.literal_eval(repr(kwargs.get('gene')).split(' ', 1)[1])
+				
 		self.geneID = kwargs.get('ID', self.geneID)
 		self.geneName = kwargs.get('Name', self.geneName)
 		self.geneAcc = kwargs.get('Acc', self.geneAcc)
 		self.geneLocStart = kwargs.get('Start', self.geneLocStart)
 		self.geneLocEnd = kwargs.get('End', self.geneLocEnd)
 		self.geneFASTA = kwargs.get('FASTA', self.geneFASTA)
+		self.geneStatus = kwargs.get('Status', self.geneStatus)
 		if self.geneFASTA != None:			
 			with open(self.geneFASTA, 'r+') as f:
 				t = 0
@@ -86,22 +94,24 @@ class Gene:
 
 	def __repr__(self):
 		reprRet = 'Gene {'
-		reprRet += '\'ID\': '    + repr(self.geneID)       + ', '
-		reprRet += '\'Name\': '  + repr(self.geneName)     + ', '
-		reprRet += '\'Acc\': '   + repr(self.geneAcc)      + ', '
-		reprRet += '\'Start\': ' + repr(self.geneLocStart) + ', '
-		reprRet += '\'End\': '   + repr(self.geneLocEnd)   + ', '
-		reprRet += '\'Len\': '   + repr(self.geneLen)      + ', '
-		reprRet += '\'FASTA\': ' + repr(self.geneFASTA)    + '}'
+		reprRet += '\'ID\': '     + repr(self.geneID)       + ', '
+		reprRet += '\'Name\': '   + repr(self.geneName)     + ', '
+		#reprRet += '\'Status\': ' + repr(self.geneStatus)      + ', '
+		reprRet += '\'Acc\': '    + repr(self.geneAcc)      + ', '
+		reprRet += '\'Start\': '  + repr(self.geneLocStart) + ', '
+		reprRet += '\'End\': '    + repr(self.geneLocEnd)   + ', '
+		reprRet += '\'Len\': '    + repr(self.geneLen)      + ', '
+		reprRet += '\'FASTA\': '  + repr(self.geneFASTA)    + '}'
 		return reprRet
 	
 	def __str__(self):
 		strRet  = 'Gene'
-		strRet += '\tID   : ' + repr(self.geneID)       + '\n'
-		strRet += '\tName : ' + repr(self.geneName)     + '\n'
-		strRet += '\tAcc  : ' + repr(self.geneAcc)      + '\n'
-		strRet += '\tStart: ' + repr(self.geneLocStart) + '\n'
-		strRet += '\tEnd  : ' + repr(self.geneLocEnd)   + '\n'
-		strRet += '\tLen  : ' + repr(self.geneLen)      + '\n'
-		strRet += '\tFASTA: ' + repr(self.geneFASTA)    + '\n'
+		strRet += '\tID    : ' + repr(self.geneID)       + '\n'
+		strRet += '\tName  : ' + repr(self.geneName)     + '\n'
+		strRet += '\tStatus: ' + repr(self.geneStatus)      + '\n'
+		strRet += '\tAcc   : ' + repr(self.geneAcc)      + '\n'
+		strRet += '\tStart : ' + repr(self.geneLocStart) + '\n'
+		strRet += '\tEnd   : ' + repr(self.geneLocEnd)   + '\n'
+		strRet += '\tLen   : ' + repr(self.geneLen)      + '\n'
+		strRet += '\tFASTA : ' + repr(self.geneFASTA)    + '\n'
 		return strRet
